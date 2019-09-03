@@ -58,7 +58,7 @@ class VideoStreamingTest(object):
         self.streaming()
 
     def dqn_loop(self):
-        if self.finnal_result['me']['r'] > 1:
+        if self.finnal_result['me']['r'] > 2:
             self.done = True
         else:
             self.done = False
@@ -206,9 +206,7 @@ class VideoStreamingTest(object):
                 alpha_small = math.pi/2
             else:
                 alpha_small = 0-math.pi/2
-            
-
-        
+                    
 
         if temp_x0 > 0:
             alpha_big = math.atan(temp_y0/temp_x0)
@@ -228,6 +226,24 @@ class VideoStreamingTest(object):
                 "r" : r,
                 "x0": x0,
                 "y0": y0}
+    def get_me_to_enemy(self, x1, y1, x2, y2):
+        det_x = x1 - x2
+        det_y = y1 - y2
+        if det_x > 0:
+            alpha_big = math.atan(det_y/det_x)
+        elif det_x < 0:
+            alpha_big = math.atan(det_y/det_x) + math.pi
+        else:
+            if det_y > 0:
+                alpha_big = math.pi/2
+            else:
+                alpha_big = 0 - math.pi/2
+        alpha_big = alpha_big/math.pi - 0.5
+        alpha_small = self.finnal_result['me']['alpha_big'] - alpha_big
+        r = math.sqrt(det_x**2 + det_y**2)/self.RANGE
+        return {"alpha_big" : alpha_big,
+                "alpha_small":alpha_small,
+                "r" : r}
 
 
     def get_finnal_result(self):
@@ -245,6 +261,12 @@ class VideoStreamingTest(object):
         finnal_temp["me"] = me_temp
         finnal_temp["enemy"] = enemy_temp
         self.finnal_result = finnal_temp
+        me_to_enemy_temp = self.get_me_to_enemy(self.finnal_result['me']['x0'],
+                            self.finnal_result['me']['y0'],
+                            self.finnal_result['enemy']['x0'],
+                            self.finnal_result['enemy']['y0'])
+        self.finnal_result['me_to_enemy'] = me_to_enemy_temp
+        
 
     def draw(self, frame, lowerRGB, upperRGB, word):
 
@@ -379,6 +401,13 @@ class VideoStreamingTest(object):
                                     4,
                                     4
                                     )
+                        cv2.line(frame, 
+                                    (int(self.finnal_result["me"]["x0"]), int(self.finnal_result["me"]["y0"])), 
+                                    (int(self.finnal_result["enemy"]["x0"]), int(self.finnal_result["enemy"]["y0"])),
+                                    (0, 255, 0),
+                                    1,
+                                    4
+                                )
                         font = cv2.FONT_HERSHEY_SIMPLEX
                         cv2.putText(frame,  str(self.finnal_result["me"]["alpha_big"]),
                                             (int(self.finnal_result["me"]["x0"]), int(self.finnal_result["me"]["y0"])), 
