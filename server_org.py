@@ -432,6 +432,7 @@ class VideoStreamingTest(object):
                         break
         finally:
             self.agent.save('fight_model.h5')
+            print("model_saved")
             self.connection.close()
             self.server_socket.close()
 
