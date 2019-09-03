@@ -27,6 +27,7 @@ class VideoStreamingTest(object):
         self.done = False
         self.batch_size = 32
         self.agent = DQNAgent(self.state_size, self.action_size)
+        self.agent.load('fight_model.h5')
         self.state_now =np.reshape([ 0.10606659, -0.52737298,  0.47917915], [1, self.state_size])
         self.state_last = np.reshape([ 0.10606659, -0.52737298,  0.47917915], [1, self.state_size])
         self.action_for_next = 0
