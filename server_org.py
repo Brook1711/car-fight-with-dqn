@@ -1,28 +1,25 @@
 import numpy as np
 import cv2
 import socket
-from collections import deque
+# from collections import deque
 import time
 import math
-import os
-import ast,json
-import string
+# import os
+# import ast,json
+# import string
 from dqn import DQNAgent
-#209 88 74
-#200-210 80-90 70-80
-#10-20 40-50 90-100
-#5-10 50-70 90-100
+# 209 88 74
+# 200-210 80-90 70-80
+# 10-20 40-50 90-100
+# 5-10 50-70 90-100
 the_ip = '192.168.43.203'
 server_addr = (the_ip, 8888)
 socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 socket_tcp.connect(server_addr)
 
 start_time = time.time()
-#socket_tcp.send(str(start_time).encode("utf-8"))
-count =0 
-
-
-
+# socket_tcp.send(str(start_time).encode("utf-8"))
+count =0
 class VideoStreamingTest(object):
     def __init__(self, host, port):     
         self.state_size = 3
@@ -41,7 +38,7 @@ class VideoStreamingTest(object):
         self.backward = "T330"
         self.stop = "T370"
         self.middle = "S360"
-        #dqn parameters
+        # dqn parameters
         self.server_socket = socket.socket()
         self.server_socket.bind((host, port))
         self.server_socket.listen(0)
@@ -63,16 +60,16 @@ class VideoStreamingTest(object):
         else:
             self.done = False
         if True:
-            self.prepare_state()#更新前一次状态，并获取这一次状态
-            self.prepare_action()#更新前一次动作，并获取本次操作
+            self.prepare_state()# 更新前一次状态，并获取这一次状态
+            self.prepare_action()# 更新前一次动作，并获取本次操作
 
             if self.count == 1:
-                self.prepare_reward()#获取上一次活动的奖励
+                self.prepare_reward()# 获取上一次活动的奖励
             else:
                 self.count+=1
-            self.act_move()#更新小车运动状态
+            self.act_move()# 更新小车运动状态
             if self.count == 1:
-                self.remember_step()#收集本次数据
+                self.remember_step()# 收集本次数据
             if len(self.agent.memory) > self.batch_size:
                 self.agent.replay(self.batch_size)
 
@@ -82,18 +79,18 @@ class VideoStreamingTest(object):
         self.finnal_result['me']['alpha_small'], \
         self.finnal_result['me']['r']]
         self.state_now = np.reshape(state_now_, [1, self.state_size])
-        #self.state_now = state_now_
+        # self.state_now = state_now_
         
     def prepare_action(self):
         self.action_for_now = self.action_for_next
         self.action_for_next = self.agent.act(self.state_now)
     
-    def prepare_reward(self):#运行条件：state_last非空
+    def prepare_reward(self):# 运行条件：state_last非空
         if self.done:
             self.reward = -10
         else:
             self.reward = (self.state_last[0][2] - self.state_now[0][2])*100
-            #self.reward = (self.state_last[2] - self.state_now[2])*100
+            # self.reward = (self.state_last[2] - self.state_now[2])*100
     def remember_step(self):
         self.agent.remember(self.state_last, self.action_for_now, self.reward, self.state_now, self.done)
 
@@ -101,7 +98,7 @@ class VideoStreamingTest(object):
         if self.done:
             self.action_for_next = 0
 
-        if self.action_for_next == 0:#停止
+        if self.action_for_next == 0:# 停止
             str_S = self.middle
             str_T = self.stop
             str_S = str_S.encode("utf-8")
@@ -110,7 +107,7 @@ class VideoStreamingTest(object):
             socket_tcp.send(str_T)
 
 
-        elif self.action_for_next == 1:#前进
+        elif self.action_for_next == 1:# 前进
             str_S = self.middle
             str_T = self.forward
             str_S = str_S.encode("utf-8")
@@ -118,7 +115,7 @@ class VideoStreamingTest(object):
             socket_tcp.send(str_S)
             socket_tcp.send(str_T)
 
-        elif self.action_for_next == 2:#左转前进
+        elif self.action_for_next == 2:# 左转前进
             str_S = self.left
             str_T = self.forward
             str_S = str_S.encode("utf-8")
@@ -126,7 +123,7 @@ class VideoStreamingTest(object):
             socket_tcp.send(str_S)
             socket_tcp.send(str_T)
 
-        elif self.action_for_next == 3:#右转前进
+        elif self.action_for_next == 3:# 右转前进
             str_S = self.right
             str_T = self.forward
             str_S = str_S.encode("utf-8")
@@ -134,7 +131,7 @@ class VideoStreamingTest(object):
             socket_tcp.send(str_S)
             socket_tcp.send(str_T)
 
-        elif self.action_for_next == 4:#后退
+        elif self.action_for_next == 4:# 后退
             str_S = self.middle
             str_T = self.backward
             str_S = str_S.encode("utf-8")
@@ -154,7 +151,7 @@ class VideoStreamingTest(object):
             socket_tcp.send(str_S)
             socket_tcp.send(str_T)
 
-        elif self.action_for_next == 5:#左转后退
+        elif self.action_for_next == 5:# 左转后退
             str_S = self.left
             str_T = self.backward
             str_S = str_S.encode("utf-8")
@@ -170,7 +167,7 @@ class VideoStreamingTest(object):
             str_S = str_S.encode("utf-8")
             str_T = str_T.encode("utf-8")
 
-        elif self.action_for_next == 6:#右转后退
+        elif self.action_for_next == 6:# 右转后退
             str_S = self.right
             str_T = self.backward
             str_S = str_S.encode("utf-8")
@@ -221,6 +218,7 @@ class VideoStreamingTest(object):
         alpha_small = alpha_small/math.pi - 0.5
         alpha_big = alpha_big/math.pi - 0.5
         r = math.sqrt(temp_x0**2 + temp_y0**2)/self.RANGE
+        
         return {"alpha_big" : alpha_big,
                 "alpha_small":alpha_small,
                 "r" : r,
@@ -271,26 +269,26 @@ class VideoStreamingTest(object):
     def draw(self, frame, lowerRGB, upperRGB, word):
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-                    # 根据阈值构建掩膜
+                    #  根据阈值构建掩膜
         mask = cv2.inRange(hsv, lowerRGB, upperRGB)
-                    # 腐蚀操作
+                    #  腐蚀操作
         mask = cv2.erode(mask, None, iterations=2)
-                    # 膨胀操作，其实先腐蚀再膨胀的效果是开运算，去除噪点
+                    #  膨胀操作，其实先腐蚀再膨胀的效果是开运算，去除噪点
         mask = cv2.dilate(mask, None, iterations=2)
         cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
-                    # 初始化瓶盖圆形轮廓质心
+                    #  初始化瓶盖圆形轮廓质心
         center = None
-                    # 如果存在轮廓
+                    #  如果存在轮廓
         if len(cnts) > 0:
-                        # 找到面积最大的轮廓
+                        #  找到面积最大的轮廓
             c = max(cnts, key=cv2.contourArea)
-                        # 确定面积最大的轮廓的外接圆
+                        #  确定面积最大的轮廓的外接圆
             ((x, y), radius) = cv2.minEnclosingCircle(c)
-                        # 计算轮廓的矩
+                        #  计算轮廓的矩
             M = cv2.moments(c)
-                        # 计算质心
+                        #  计算质心
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-                        # 只有当半径大于10时，才执行画图
+                        #  只有当半径大于10时，才执行画图
             if radius > 10:
                 cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
                 cv2.circle(frame, center, 5, (0, 0, 255), -1)
@@ -300,7 +298,6 @@ class VideoStreamingTest(object):
                 result = {}
                 result["x"] = x
                 result["y"] = y
-                
                 return result
 
     def streaming(self):
@@ -317,25 +314,25 @@ class VideoStreamingTest(object):
             greenLower = np.array([65, 100, 100])
             greenUpper = np.array([85, 255, 255])
 
-            #blueLower = np.array([0, 0, 150])
-            #blueUpper = np.array([100, 100, 255])
+            # blueLower = np.array([0, 0, 150])
+            # blueUpper = np.array([100, 100, 255])
             blueLower = np.array([95, 100, 100])
             blueUpper = np.array([115, 255, 255])
             yellowLower = np.array([5, 100, 100])
             yellowUpper = np.array([20, 255, 255])
-            # need bytes here
+            #  need bytes here
             stream_bytes = b" "
             while True:
                 stream_bytes += self.connection.read(1024)
                 first = stream_bytes.find(b"\xff\xd8")
                 last = stream_bytes.find(b"\xff\xd9")
-                #str_ = 'S270'
-                #str_ = str_.encode("utf-8")
-                #socket_tcp.send(str_)
+                #  str_ = 'S270'
+                #  str_ = str_.encode("utf-8")
+                #  socket_tcp.send(str_)
                 
-                #f = open('record_' + str(self.count) + '.json', 'w')
-                #json.dump(dic_dump, f)
-                #f.close()
+                #  f = open('record_' + str(self.count) + '.json', 'w')
+                #  json.dump(dic_dump, f)
+                # f.close()
                 
                 if first != -1 and last != -1:
                     jpg = stream_bytes[first:last + 2]
@@ -428,18 +425,18 @@ class VideoStreamingTest(object):
                         str_T = str_T.encode("utf-8")
                         socket_tcp.send(str_S)
                         socket_tcp.send(str_T)
-                    #print(self.finnal_result)
+                    #  print(self.finnal_result)
                     cv2.imshow("Frame", frame)
-
                     if cv2.waitKey(1) & 0xFF == ord("q"):
                         break
         finally:
+            self.agent.save('fight_model.h5')
             self.connection.close()
             self.server_socket.close()
 
 
 if __name__ == "__main__":
-    # host, port
+    #  host, port
     h, p = "192.168.137.1", 8000
-    #h = input("the up pi ip: ")
+    # h = input("the up pi ip: ")
     VideoStreamingTest(h, p)
