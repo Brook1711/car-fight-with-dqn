@@ -27,7 +27,7 @@ class VideoStreamingTest(object):
         self.done = False
         self.batch_size = 32
         self.agent = DQNAgent(self.state_size, self.action_size)
-        self.agent.load('fight_model.h5')
+        # self.agent.load('fight_model.h5')
         self.state_now =np.reshape([ 0.10606659, -0.52737298,  0.47917915], [1, self.state_size])
         self.state_last = np.reshape([ 0.10606659, -0.52737298,  0.47917915], [1, self.state_size])
         self.action_for_next = 0
@@ -159,6 +159,7 @@ class VideoStreamingTest(object):
             str_T = str_T.encode("utf-8")
             socket_tcp.send(str_S)
             socket_tcp.send(str_T)
+            
             str_S = self.left
             str_T = self.stop
             str_S = str_S.encode("utf-8")
@@ -205,7 +206,6 @@ class VideoStreamingTest(object):
             else:
                 alpha_small = 0-math.pi/2
                     
-
         if temp_x0 > 0:
             alpha_big = math.atan(temp_y0/temp_x0)
         elif temp_x0 < 0:
